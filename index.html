@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Códigos QR | Kairos Online Seminary</title>
+  <style>
+    :root {
+      --primary-green: #1E376B;
+      --secondary-green: #55C7F1;
+      --primary-blue: #162B55;
+      --white: #ffffff;
+      --surface: #F6F8FC;
+      --border: rgba(30, 55, 107, 0.12);
+      --text: #162B55;
+      --muted: #6D7FA2;
+      --shadow: 0 22px 60px rgba(22, 43, 85, 0.18);
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --transition: 180ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(85, 199, 241, 0.22), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(30, 55, 107, 0.18), transparent 30%),
+        linear-gradient(145deg, #162B55 0%, #1E376B 48%, #214882 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page-shell {
+      width: min(1100px, 100%);
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(320px, 1fr);
+      gap: 28px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel {
+      padding: 32px;
+    }
+
+    .panel-left {
+      background:
+        linear-gradient(180deg, rgba(30, 55, 107, 0.04), rgba(85, 199, 241, 0.08)),
+        var(--surface);
+      border-right: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .brand img {
+      width: min(100%, 260px);
+      height: auto;
+      display: block;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(30, 55, 107, 0.08);
+      color: var(--primary-green);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 3vw, 2.65rem);
+      line-height: 1.05;
+      color: var(--primary-green);
+    }
+
+    .subtitle {
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .helper-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 14px;
+    }
+
+    .helper-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .helper-list li::before {
+      content: "";
+      flex: 0 0 10px;
+      width: 10px;
+      height: 10px;
+      margin-top: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--secondary-green), var(--primary-blue));
+    }
+
+    .panel-right {
+      display: grid;
+      gap: 20px;
+      align-content: start;
+      background: linear-gradient(180deg, #ffffff, #f9fbf8);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1fr) minmax(150px, 190px);
+      gap: 16px;
+    }
+
+    label {
+      color: var(--primary-green);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    input[type="text"],
+    select,
+    input[type="color"] {
+      width: 100%;
+      border: 1px solid rgba(30, 55, 107, 0.18);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      color: var(--text);
+      font: inherit;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    input[type="text"],
+    select {
+      min-height: 54px;
+      padding: 14px 16px;
+    }
+
+    input[type="color"] {
+      min-height: 54px;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    input[type="color"]:focus,
+    button:focus-visible {
+      outline: none;
+      border-color: rgba(85, 199, 241, 0.95);
+      box-shadow: 0 0 0 4px rgba(85, 199, 241, 0.22);
+    }
+
+    .field-hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition), background var(--transition);
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-green), #266747);
+      color: var(--white);
+      box-shadow: 0 14px 26px rgba(30, 55, 107, 0.22);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary-green), #38b8e5);
+      color: var(--white);
+      box-shadow: 0 14px 26px rgba(85, 199, 241, 0.24);
+    }
+
+    .btn-ghost {
+      background: rgba(30, 55, 107, 0.08);
+      color: var(--primary-green);
+    }
+
+    .status {
+      min-height: 26px;
+      margin: 0;
+      padding: 0 2px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .status.is-error {
+      color: #a13232;
+    }
+
+    .status.is-success {
+      color: var(--primary-green);
+    }
+
+    .preview-card {
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+      padding: 22px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(85, 199, 241, 0.08), rgba(30, 55, 107, 0.08)),
+        #fbfdf9;
+      border: 1px solid rgba(30, 55, 107, 0.1);
+    }
+
+    .preview-head {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--primary-green);
+    }
+
+    .preview-head strong {
+      font-size: 1rem;
+    }
+
+    .preview-head span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .qr-frame {
+      width: 100%;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 247, 243, 0.98));
+      border: 1px dashed rgba(30, 55, 107, 0.18);
+      overflow: auto;
+    }
+
+    #qrcode {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 100%;
+    }
+
+    #qrcode canvas {
+      display: block;
+      width: min(100%, var(--preview-size, 320px));
+      height: auto;
+      max-width: 100%;
+      background: var(--white);
+      border-radius: 22px;
+      box-shadow: 0 18px 30px rgba(12, 31, 22, 0.12);
+    }
+
+    .preview-empty {
+      margin: 0;
+      max-width: 320px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 920px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px;
+      }
+
+      .panel {
+        padding: 24px 18px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .qr-frame {
+        min-height: 260px;
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-shell">
+    <section class="card" aria-label="Generador institucional de códigos QR">
+      <div class="panel panel-left">
+        <div class="brand">
+          <img src="logo.webp" alt="Kairos Online Seminary">
+          <span class="eyebrow">Kairos Online Seminary</span>
+        </div>
+
+        <h1>Generador de Códigos QR</h1>
+        <p class="subtitle">Herramienta institucional de Kairos Online Seminary</p>
+
+        <ul class="helper-list" aria-label="Características principales">
+          <li>Genera códigos QR con color institucional y fondo blanco para una lectura confiable.</li>
+          <li>Inserta automáticamente el logo de Kairos al centro del código QR cuando está disponible.</li>
+          <li>Descarga el resultado final en PNG listo para compartir o imprimir.</li>
+        </ul>
+      </div>
+
+      <div class="panel panel-right">
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="text-input">Texto o enlace</label>
+            <input type="text" id="text-input" placeholder="Ingrese texto, URL, referencia o contenido institucional"
+              autocomplete="off" spellcheck="false">
+            <span class="field-hint">Puede usar enlaces completos, texto libre o referencias internas.</span>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="size-select">Tamaño del QR</label>
+              <select id="size-select">
+                <option value="300">300 px</option>
+                <option value="500" selected>500 px</option>
+                <option value="800">800 px</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="color-picker">Color del QR</label>
+              <input type="color" id="color-picker" value="#1E376B" aria-label="Seleccionar color del QR">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="generate-btn" class="btn-primary">Generar QR</button>
+            <button type="button" id="download-btn" class="btn-secondary" disabled>Descargar PNG</button>
+            <button type="button" id="clear-btn" class="btn-ghost">Limpiar</button>
+          </div>
+
+          <p id="status-message" class="status" role="status" aria-live="polite">Ingrese texto o enlace para continuar.
+          </p>
+        </div>
+
+        <section class="preview-card" aria-labelledby="preview-title">
+          <div class="preview-head">
+            <strong id="preview-title">Vista previa</strong>
+            <span id="preview-meta">Listo para generar</span>
+          </div>
+
+          <div class="qr-frame">
+            <div id="qrcode" aria-live="polite">
+              <p id="preview-empty" class="preview-empty">El código QR aparecerá aquí después de generarlo.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="qrcode.min.js"></script>
+  <script>
+    // Referencias principales de la interfaz.
+    const textInput = document.getElementById('text-input');
+    const sizeSelect = document.getElementById('size-select');
+    const colorPicker = document.getElementById('color-picker');
+    const generateBtn = document.getElementById('generate-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const qrCodeContainer = document.getElementById('qrcode');
+    const previewMeta = document.getElementById('preview-meta');
+    const statusMessage = document.getElementById('status-message');
+
+    // Estado compartido del QR final listo para descarga.
+    let finalQrCanvas = null;
+
+    // Imagen del logo institucional. Si falla, la app sigue funcionando sin romperse.
+    const logoImage = new Image();
+    let logoReady = false;
+    let logoFailed = false;
+
+    logoImage.addEventListener('load', () => {
+      logoReady = true;
+      logoFailed = false;
+    });
+
+    logoImage.addEventListener('error', () => {
+      logoReady = false;
+      logoFailed = true;
+      console.warn('No se pudo cargar logo.webp. El QR se generara sin logo central.');
+    });
+
+    logoImage.src = 'logo.webp';
+
+    // Actualiza el mensaje visual y accesible de estado.
+    function setStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.classList.remove('is-error', 'is-success');
+
+      if (type) {
+        statusMessage.classList.add(type === 'error' ? 'is-error' : 'is-success');
+      }
+    }
+
+    // Reinicia el contenedor de vista previa.
+    function resetPreview() {
+      qrCodeContainer.innerHTML = '<p id="preview-empty" class="preview-empty">El código QR aparecera aqui despues de generarlo.</p>';
+      previewMeta.textContent = 'Listo para generar';
+      downloadBtn.disabled = true;
+      finalQrCanvas = null;
+      document.documentElement.style.setProperty('--preview-size', '320px');
+    }
+
+    // Dibuja el logo central sobre el canvas final con un fondo blanco redondeado.
+    function drawLogoOnCanvas(canvas) {
+      if (!logoReady) {
+        return;
+      }
+
+      const context = canvas.getContext('2d');
+      const qrSize = canvas.width;
+      const logoRatio = 0.2;
+      const logoSize = qrSize * logoRatio;
+      const padding = qrSize * 0.035;
+      const containerSize = logoSize + (padding * 2);
+      const x = (qrSize - containerSize) / 2;
+      const y = (qrSize - containerSize) / 2;
+      const radius = Math.max(18, qrSize * 0.035);
+
+      context.save();
+      context.fillStyle = '#ffffff';
+      context.beginPath();
+      context.moveTo(x + radius, y);
+      context.lineTo(x + containerSize - radius, y);
+      context.quadraticCurveTo(x + containerSize, y, x + containerSize, y + radius);
+      context.lineTo(x + containerSize, y + containerSize - radius);
+      context.quadraticCurveTo(x + containerSize, y + containerSize, x + containerSize - radius, y + containerSize);
+      context.lineTo(x + radius, y + containerSize);
+      context.quadraticCurveTo(x, y + containerSize, x, y + containerSize - radius);
+      context.lineTo(x, y + radius);
+      context.quadraticCurveTo(x, y, x + radius, y);
+      context.closePath();
+      context.fill();
+
+      context.shadowColor = 'rgba(0, 0, 0, 0.08)';
+      context.shadowBlur = qrSize * 0.02;
+      context.drawImage(logoImage, (qrSize - logoSize) / 2, (qrSize - logoSize) / 2, logoSize, logoSize);
+      context.restore();
+    }
+
+    // Crea un canvas final a partir del generado por qrcode.min.js.
+    function buildFinalCanvas(sourceCanvas, size) {
+      const finalCanvas = document.createElement('canvas');
+      const numericSize = Number(size);
+      finalCanvas.width = numericSize;
+      finalCanvas.height = numericSize;
+
+      const context = finalCanvas.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, numericSize, numericSize);
+      context.drawImage(sourceCanvas, 0, 0, numericSize, numericSize);
+      drawLogoOnCanvas(finalCanvas);
+
+      return finalCanvas;
+    }
+
+    // Inserta el canvas final en la vista previa y habilita la descarga.
+    function renderFinalCanvas(canvas, size) {
+      qrCodeContainer.innerHTML = '';
+      canvas.setAttribute('aria-label', 'Codigo QR generado');
+      qrCodeContainer.appendChild(canvas);
+      finalQrCanvas = canvas;
+      downloadBtn.disabled = false;
+      document.documentElement.style.setProperty('--preview-size', Math.min(Number(size), 520) + 'px');
+    }
+
+    // Genera el QR respetando el contenido original sin alterar URLs o caracteres importantes.
+    function generateQr() {
+      const content = textInput.value.trim();
+      const size = sizeSelect.value;
+      const color = colorPicker.value;
+
+      if (!content) {
+        resetPreview();
+        setStatus('Ingrese texto o enlace para continuar.', 'error');
+        textInput.focus();
+        return;
+      }
+
+      downloadBtn.disabled = true;
+      finalQrCanvas = null;
+      previewMeta.textContent = 'Generando...';
+      setStatus('Generando codigo QR...', null);
+      qrCodeContainer.innerHTML = '';
+
+      // Se crea primero el QR base usando la libreria local existente.
+      new QRCode(qrCodeContainer, {
+        text: content,
+        width: Number(size),
+        height: Number(size),
+        colorDark: color,
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      // La libreria dibuja el canvas de forma asincrona en algunos navegadores.
+      window.setTimeout(() => {
+        const sourceCanvas = qrCodeContainer.querySelector('canvas');
+
+        if (!sourceCanvas) {
+          resetPreview();
+          setStatus('No fue posible generar el codigo QR. Intente nuevamente.', 'error');
+          return;
+        }
+
+        const finishedCanvas = buildFinalCanvas(sourceCanvas, size);
+        renderFinalCanvas(finishedCanvas, size);
+        previewMeta.textContent = size + ' px';
+
+        if (logoReady) {
+          setStatus('QR generado correctamente con logo institucional.', 'success');
+        } else if (logoFailed) {
+          setStatus('QR generado correctamente sin logo institucional.', 'success');
+        } else {
+          setStatus('QR generado correctamente.', 'success');
+        }
+      }, 180);
+    }
+
+    // Descarga el canvas final compuesto como PNG.
+    function downloadQr() {
+      if (!finalQrCanvas) {
+        setStatus('Primero genere un codigo QR antes de descargar.', 'error');
+        return;
+      }
+
+      const downloadLink = document.createElement('a');
+      downloadLink.download = 'kairos-qr.png';
+      downloadLink.href = finalQrCanvas.toDataURL('image/png');
+      downloadLink.click();
+      setStatus('Descarga iniciada: kairos-qr.png', 'success');
+    }
+
+    // Limpia la interfaz y restaura el estado inicial.
+    function clearForm() {
+      textInput.value = '';
+      colorPicker.value = '#1E376B';
+      sizeSelect.value = '500';
+      resetPreview();
+      setStatus('Ingrese texto o enlace para continuar.', null);
+      textInput.focus();
+    }
+
+    generateBtn.addEventListener('click', generateQr);
+    downloadBtn.addEventListener('click', downloadQr);
+    clearBtn.addEventListener('click', clearForm);
+
+    textInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        generateQr();
+      }
+    });
+
+    resetPreview();
+  </script>
+</body>
+
+</html>
